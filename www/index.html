@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  	<meta charset="utf-8" /> 
+  	<title>JournalMap and ORCID</title>
+  	
+    <style type="text/css">
+      body { margin: 20px; font-family:sans-serif;}
+      input[type="text"] {
+    		font-size:14px;
+		}
+		button {font-size:14px;}
+    </style>
+    
+    <!-- jquery -->
+    <script src="jquery-1.11.2.min.js"></script>
+
+    <!-- leaflet -->
+	<link rel="stylesheet" href="leaflet-0.7.3/leaflet.css" />
+	<script src="leaflet-0.7.3/leaflet.js"></script>
+	
+	<script>
+		var map;
+		var geojson = null;
+	
+		function onEachFeature(feature, layer) {
+			// does this feature have a property named popupContent?
+			if (feature.properties && feature.properties.popupContent) {
+				layer.bindPopup(feature.properties.popupContent);
+			}
+		}	
+    	
+    	
+    	function create_map() {
+    		
+			var mbAttr = '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>';
+				mbUrl = 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png';
+	
+			var positron   = L.tileLayer(mbUrl, {id: 'positron', attribution: mbAttr});
+	
+			map = L.map('map', { center: [0,0], zoom: 2, layers: [positron]} );
+			
+			var baseLayers = {
+				"Positron": positron
+			};		
+			
+			L.control.layers(baseLayers).addTo(map);
+			
+			
+			L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+				maxZoom: 18,
+				attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+				id: 'positron'
+			}).addTo(map);
+
+		}
+		
+		function add_data(data) {
+		    if (geojson) {
+		    	map.removeLayer(geojson);
+		    }
+			
+			geojson = L.geoJson(data, { 
+			style: function (feature) {
+				return feature.properties && feature.properties.style;
+			},
+			onEachFeature: onEachFeature,
+			}).addTo(map);
+			
+			/*
+       var southWest = L.latLng(data.bbox[1], data.bbox[0]),
+    	northEast = L.latLng(data.bbox[3], data.bbox[2]),
+    	bounds = L.latLngBounds(southWest, northEast);	
+    	map.fitBounds(bounds);	
+    	*/		
+		
+		
+		}
+		
+		// get points in area
+		function points() {
+			
+		
+			$.get('api_spatial.php?bbox=-10%2C20%2C10%2C40', 
+				function(data) {
+					// add GeoJSON to the map
+					
+					var d = JSON.parse(data);
+					//add_data(d.geometry);
+					add_data(d); 
+					
+					console.log(d);
+				
+				 });
+	
+		}		
+		
+
+		</script>
+    
+	</head>
+	<body>
+		<h1>JournalMap and ORCID</h1>
+				
+		<div id="map" style="width:100%; height:600px;"></div>	
+		
+		<script>		
+			create_map();
+			
+			/*
+			var json = '{ "type": "Point", "coordinates": [ -105.01621, 39.57422 ]}';
+			add_data(JSON.parse(json));  
+			*/
+
+			points();
+    
+
+		
+			
+		</script>
+	
+	</body>
+</html>
