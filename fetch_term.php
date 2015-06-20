@@ -5,7 +5,8 @@
 require_once (dirname(__FILE__) . '/couchsimple.php');
 require_once (dirname(__FILE__) . '/lib.php');
 
-$term = 'Africa';
+$term = 'Zookeys';
+$term = 'new species';
 
 $url = 'https://journalmap.org//api/articles.json'
 	. '?key=' . $config['journal_map_key']

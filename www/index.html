@@ -80,8 +80,9 @@
 		// get points in area
 		function points() {
 			
+			var bbox = '-180,-90,180,90';
 		
-			$.get('api_spatial.php?bbox=-10%2C20%2C10%2C40', 
+			$.get('api_spatial.php?bbox=' + encodeURIComponent(bbox), 
 				function(data) {
 					// add GeoJSON to the map
 					
